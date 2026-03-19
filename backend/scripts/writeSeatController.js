@@ -15,7 +15,6 @@ exports.getSeats = async (req, res) => {
 
   let seats = await Seat.find().sort({ row: 1, number: 1 });
 
-  // If there are no seats in the database yet, seed a default layout.
   if (seats.length === 0) {
     const rows = ["A", "B", "C", "D", "E"];
     const seedPromises = [];
@@ -45,7 +44,7 @@ exports.lockSeats = async (req, res) => {
 
   const expiry = new Date(Date.now() + 2 * 60 * 1000);
 
-  // Lock a specific list of seats (used when a user selects seats manually)
+  // Lock a specific list of seats when a user selects seats manually
   if (Array.isArray(seatIds) && seatIds.length > 0) {
     await Seat.updateMany(
       { _id: { $in: seatIds }, status: "available" },
@@ -61,7 +60,7 @@ exports.lockSeats = async (req, res) => {
     return res.json(lockedSeats);
   }
 
-  // Lock a number of consecutive seats (auto-allocate)
+  // Lock a number of consecutive seats.
   if (!count || count <= 0) {
     return res.status(400).json({ message: "count must be a positive number" });
   }
